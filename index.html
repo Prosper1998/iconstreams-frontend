@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICON Streaming</title>
+    <link rel="stylesheet" href="main.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <nav>
+        <div class="nav-container">
+            <div class="logo">ICON</div>
+            <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+            <div class="nav-links">
+                <a href="index.html" class="active">Home</a>
+                <a href="movies.html">Movies</a>
+                <a href="tv-shows.html">TV Shows</a>
+                <a href="local.html">Local</a>
+                <a href="my-list.html">My List</a>
+            </div>
+            <div class="nav-actions">
+                <div class="search-container">
+                    <input type="text" placeholder="Search..." id="searchInput">
+                    <button class="search-btn"><i class="fas fa-search"></i></button>
+                </div>
+                <button class="btn primary sign-in-btn">Sign In</button>
+                <button class="btn secondary sign-up-btn">Sign Up</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="mobile-menu-overlay">
+        <div class="mobile-menu-container">
+            <div class="mobile-menu-header">
+                <div class="logo">ICON</div>
+                <button class="mobile-menu-close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="mobile-menu-links">
+                <a href="index.html" class="active">Home</a>
+                <a href="movies.html">Movies</a>
+                <a href="tv-shows.html">TV Shows</a>
+                <a href="local.html">Local</a>
+                <a href="my-list.html">My List</a>
+            </div>
+            <div class="mobile-search">
+                <div class="search-container">
+                    <input type="text" placeholder="Search..." id="mobileSearchInput">
+                    <button class="search-btn"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            <div class="mobile-menu-footer">
+                <a href="#" class="mobile-signin-link"><i class="fas fa-sign-in-alt"></i> Sign In</a>
+                <a href="#"><i class="fas fa-info-circle"></i> About</a>
+                <a href="#"><i class="fas fa-question-circle"></i> Help</a>
+            </div>
+        </div>
+    </div>
+
+    <main id="homepageContent"></main>
+
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn"><i class="fas fa-times"></i></span>
+            <video id="iconPlayer" controls preload="auto" width="900" height="500">
+                <source src="" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="video-info">
+                <h3>Video Title</h3>
+                <div class="meta">
+                    <span>Year</span>
+                    <div class="meta-dot"></div>
+                    <span>Genre</span>
+                    <div class="meta-dot"></div>
+                    <span>Duration</span>
+                </div>
+                <p class="video-description">Video description will appear here.</p>
+                <div class="video-actions">
+                    <button class="btn primary"><i class="fas fa-plus"></i> Add to Watchlist</button>
+                    <button class="btn secondary"><i class="fas fa-share-alt"></i> Share</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="authBackground" class="auth-background">
+        <div class="background-overlay"></div>
+    </div>
+
+    <div id="loginModal" class="auth-modal" role="dialog" aria-labelledby="loginModalTitle" aria-modal="true">
+        <div class="auth-modal-content">
+            <button class="auth-close-btn" aria-label="Close dialog"><i class="fas fa-times"></i></button>
+            <div class="auth-header">
+                <h1 id="loginModalTitle">Sign In</h1>
+            </div>
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <input type="email" id="loginEmail" name="email" placeholder="Email" required>
+                    <span class="error-message" id="loginEmailError"></span>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" name="password" placeholder="Password" required>
+                    <span class="error-message" id="loginPasswordError"></span>
+                </div>
+                <button type="submit" class="btn auth-btn">Sign In</button>
+                <div class="form-options">
+                    <label class="checkbox">
+                        <input type="checkbox" name="remember"> Remember me
+                    </label>
+                    <a href="#" class="help-link">Need help?</a>
+                </div>
+            </form>
+            <div class="auth-footer">
+                <p>New to ICON? <a href="#" id="showSignup">Sign up now</a>.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="signupModal" class="auth-modal" role="dialog" aria-labelledby="signupModalTitle" aria-modal="true">
+        <div class="auth-modal-content">
+            <button class="auth-close-btn" aria-label="Close dialog"><i class="fas fa-times"></i></button>
+            <div class="auth-header">
+                <h1 id="signupModalTitle">Sign Up</h1>
+            </div>
+            <form id="signupForm" class="auth-form">
+                <div class="form-group">
+                    <input type="text" id="signupName" name="name" placeholder="Full Name" required>
+                    <span class="error-message" id="signupNameError"></span>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="signupEmail" name="email" placeholder="Email" required>
+                    <span class="error-message" id="signupEmailError"></span>
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="signupPhone" name="phone" placeholder="Phone Number" required>
+                    <span class="error-message" id="signupPhoneError"></span>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="signupPassword" name="password" placeholder="Password" required>
+                    <span class="error-message" id="signupPasswordError"></span>
+                </div>
+                <div class="form-options">
+                    <label class="checkbox">
+                        <input type="checkbox" name="terms" required> I agree to the <a href="#">Terms of Service</a>
+                    </label>
+                </div>
+                <button type="submit" class="btn auth-btn">Sign Up</button>
+            </form>
+            <div class="auth-footer">
+                <p>Already a member? <a href="#" id="showLogin">Sign in now</a>.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="notificationContainer"></div>
+
+    <script src="utils.js"></script>
+    <script src="auth.js"></script>
+    <script src="app.js"></script>
+    <script src="player.js"></script>
+    <script src="payment.js"></script>
+    <script src="ui.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/content`);
+                const data = await res.json();
+
+                if (!Array.isArray(data)) throw new Error("Invalid content format");
+
+                const grouped = data.reduce((acc, item) => {
+                    const key = item.category || "Uncategorized";
+                    acc[key] = acc[key] || [];
+                    acc[key].push(item);
+                    return acc;
+                }, {});
+
+                const mainContent = document.getElementById('homepageContent');
+                Object.entries(grouped).forEach(([category, items]) => {
+                    const section = document.createElement('section');
+                    section.className = 'content-section';
+                    const containerId = `${category.toLowerCase().replace(/\s+/g, '-')}-container`;
+                    section.innerHTML = `
+                        <div class="section-header">
+                            <h2 class="section-title">${category}</h2>
+                            <a href="#" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
+                        </div>
+                        <div class="content-slider" id="${containerId}"></div>
+                    `;
+                    mainContent.appendChild(section);
+                    loadContent(`/api/content?category=${encodeURIComponent(category)}`, containerId, category);
+                });
+
+                document.querySelector('.loading').classList.add('loaded');
+
+                const searchInputs = [document.getElementById('searchInput'), document.getElementById('mobileSearchInput')];
+                searchInputs.forEach(input => {
+                    input?.addEventListener('input', async () => {
+                        const query = input.value.trim().toLowerCase();
+                        if (query.length < 3) return;
+                        try {
+                            const res = await fetch(`${API_BASE_URL}/api/content`);
+                            const data = await res.json();
+                            const filtered = data.filter(item => item.title.toLowerCase().includes(query));
+                            Object.keys(grouped).forEach(category => {
+                                const containerId = `${category.toLowerCase().replace(/\s+/g, '-')}-container`;
+                                const container = document.getElementById(containerId);
+                                if (container) {
+                                    container.innerHTML = filtered
+                                        .filter(item => item.category === category)
+                                        .map(item => `
+                                            <div class="content-card" data-video-src="${item.video}" data-id="${item._id}">
+                                                ${item.visibility === 'premium' ? '<div class="card-badge">PREMIUM</div>' : ''}
+                                                <div class="card-image">
+                                                    <img src="${item.thumbnail || '/api/placeholder/400/300'}" alt="${item.title}">
+                                                    <div class="card-overlay">
+                                                        <button class="play-btn"><i class="fas fa-play"></i></button>
+                                                    </div>
+                                                </div>
+                                                <div class="card-info">
+                                                    <h3>${item.title}</h3>
+                                                    <div class="meta">
+                                                        <span>${item.releaseYear || 'N/A'}</span>
+                                                        <div class="meta-dot"></div>
+                                                        <span>${item.category}</span>
+                                                        <div class="meta-dot"></div>
+                                                        <span>${item.duration}m</span>
+                                                    </div>
+                                                    <p>${item.description.slice(0, 100)}${item.description.length > 100 ? '...' : ''}</p>
+                                                </div>
+                                            </div>
+                                        `).join('') || `<p class="empty-message">No results for "${query}" in ${category}.</p>`;
+                                }
+                            });
+                        } catch (error) {
+                            console.error('Search error:', error);
+                            utils.showNotification('Error searching content', 'error');
+                        }
+                    });
+                });
+            } catch (err) {
+                console.error('Error loading content:', err);
+                document.querySelector('.loading').innerHTML = '<p style="color: white">Failed to load content.</p>';
+            }
+        });
+    </script>
+</body>
+</html>

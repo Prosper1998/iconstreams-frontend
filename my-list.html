@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICON - My List</title>
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.20.1/video.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.20.1/video-js.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <!-- Internal CSS -->
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <!-- Loading Animation -->
+    <div class="loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">ICON</div>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="movies.html">Movies</a>
+                <a href="tv-shows.html">TV Shows</a>
+                <a href="local.html">Local</a>
+                <a href="my-list.html" class="active">My List</a>
+            </div>
+            <div class="nav-actions">
+                <div class="search-container">
+                    <input type="text" placeholder="Search...">
+                    <button class="search-btn"><i class="fas fa-search"></i></button>
+                </div>
+                <button class="btn primary sign-in-btn">Sign In</button>
+                <button class="btn secondary sign-up-btn">Sign Up</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay">
+        <div class="mobile-menu-container">
+            <div class="mobile-menu-header">
+                <div class="logo">ICON</div>
+                <button class="mobile-menu-close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="mobile-menu-links">
+                <a href="index.html">Home</a>
+                <a href="movies.html">Movies</a>
+                <a href="tv-shows.html">TV Shows</a>
+                <a href="local.html">Local</a>
+                <a href="my-list.html" class="active">My List</a>
+            </div>
+            <div class="mobile-search">
+                <div class="search-container">
+                    <input type="text" placeholder="Search...">
+                    <button class="search-btn"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            <div class="mobile-menu-footer">
+                <a href="#" class="mobile-signin-link"><i class="fas fa-sign-in-alt"></i> Sign In</a>
+                <a href="#"><i class="fas fa-info-circle"></i> About</a>
+                <a href="#"><i class="fas fa-question-circle"></i> Help</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- My List Section -->
+    <section class="content-section">
+        <div class="section-header">
+            <h2 class="section-title">My List</h2>
+        </div>
+        <div class="watchlist-controls">
+            <div class="filter-group">
+                <label for="watchlistSort">Sort by:</label>
+                <select id="watchlistSort">
+                    <option value="title-asc">Title (A-Z)</option>
+                    <option value="title-desc">Title (Z-A)</option>
+                    <option value="meta-asc">Meta (A-Z)</option>
+                    <option value="meta-desc">Meta (Z-A)</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="watchlistFilter">Filter by genre:</label>
+                <select id="watchlistFilter">
+                    <option value="all">All Genres</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Thriller">Thriller</option>
+                    <option value="Adventure">Adventure</option>
+                    <option value="Documentary">Documentary</option>
+                    <option value="Nature">Nature</option>
+                    <option value="Historical">Historical</option>
+                </select>
+            </div>
+        </div>
+        <div class="watchlist-content">
+            <div id="watchlistItems" class="watchlist-items">
+                <!-- Watchlist items will be dynamically added here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Player Modal -->
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn"><i class="fas fa-times"></i></span>
+            <video id="iconPlayer" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" width="900" height="500">
+                <source src="" type="application/x-mpegURL">
+                Your browser does not support the video tag.
+            </video>
+            <div class="video-info">
+                <h3>Video Title</h3>
+                <div class="meta">
+                    <span>Year</span>
+                    <div class="meta-dot"></div>
+                    <span>Genre</span>
+                    <div class="meta-dot"></div>
+                    <span>Duration</span>
+                </div>
+                <p class="video-description">Video description will appear here.</p>
+                <div class="video-actions">
+                    <button class="btn primary"><i class="fas fa-plus"></i> Add to Watchlist</button>
+                    <button class="btn secondary"><i class="fas fa-share-alt"></i> Share</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Overlay for Auth Modals -->
+    <div id="authBackground" class="auth-background">
+        <div class="background-overlay"></div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="auth-modal" role="dialog" aria-labelledby="loginModalTitle" aria-modal="true">
+        <div class="auth-modal-content">
+            <button class="auth-close-btn" aria-label="Close dialog"><i class="fas fa-times"></i></button>
+            <div class="auth-header">
+                <h1 id="loginModalTitle">Sign In</h1>
+            </div>
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <input type="email" id="loginEmail" name="email" placeholder="Email" required>
+                    <span class="error-message" id="loginEmailError"></span>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" name="password" placeholder="Password" required>
+                    <span class="error-message" id="loginPasswordError"></span>
+                </div>
+                <button type="submit" class="btn auth-btn">Sign In</button>
+                <div class="form-options">
+                    <label class="checkbox">
+                        <input type="checkbox" name="remember"> Remember me
+                    </label>
+                    <a href="#" class="help-link">Need help?</a>
+                </div>
+            </form>
+            <div class="social-login">
+                <p>Or sign in with</p>
+                <div class="social-buttons">
+                    <button type="button" class="btn social-btn facebook"><i class="fab fa-facebook-f"></i> Facebook</button>
+                    <button type="button" class="btn social-btn google"><i class="fab fa-google"></i> Google</button>
+                </div>
+            </div>
+            <div class="auth-footer">
+                <p>New to ICON? <a href="#" id="showSignup">Sign up now</a>.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="auth-modal" role="dialog" aria-labelledby="signupModalTitle" aria-modal="true">
+        <div class="auth-modal-content">
+            <button class="auth-close-btn" aria-label="Close dialog"><i class="fas fa-times"></i></button>
+            <div class="auth-header">
+                <h1 id="signupModalTitle">Sign Up</h1>
+            </div>
+            <form id="signupForm" class="auth-form">
+                <div class="form-group">
+                    <input type="text" id="signupName" name="name" placeholder="Full Name" required>
+                    <span class="error-message" id="signupNameError"></span>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="signupEmail" name="email" placeholder="Email" required>
+                    <span class="error-message" id="signupEmailError"></span>
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="signupPhone" name="phone" placeholder="Phone Number" required>
+                    <span class="error-message" id="signupPhoneError"></span>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="signupPassword" name="password" placeholder="Password" required>
+                    <span class="error-message" id="signupPasswordError"></span>
+                </div>
+                <div class="form-options">
+                    <label class="checkbox">
+                        <input type="checkbox" name="terms" required> I agree to the <a href="#">Terms of Service</a>
+                    </label>
+                </div>
+                <button type="submit" class="btn auth-btn">Sign Up</button>
+            </form>
+            <div class="social-login">
+                <p>Or sign up with</p>
+                <div class="social-buttons">
+                    <button type="button" class="btn social-btn facebook"><i class="fab fa-facebook-f"></i> Facebook</button>
+                    <button type="button" class="btn social-btn google"><i class="fab fa-google"></i> Google</button>
+                </div>
+            </div>
+            <div class="auth-footer">
+                <p>Already a member? <a href="#" id="showLogin">Sign in now</a>.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification System -->
+    <div id="notificationContainer"></div>
+
+    <!-- JavaScript Files -->
+    <script src="app.js"></script>
+    <script src="auth.js"></script>
+    <script src="player.js"></script>
+    <script src="payment.js"></script>
+    <script src="ui.js"></script>
+</body>
+</html>
