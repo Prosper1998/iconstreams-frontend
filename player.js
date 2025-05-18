@@ -1,5 +1,3 @@
-const API_BASE_URL = 'https://iconstreams-backend.onrender.com';
-
 let watchlist = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
