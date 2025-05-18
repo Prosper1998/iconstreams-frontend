@@ -172,10 +172,12 @@
     <script src="payment.js"></script>
     <script src="ui.js"></script>
     <script>
+        const API_BASE_URL = 'https://iconstreams-backend.onrender.com';
+
         document.addEventListener('DOMContentLoaded', async () => {
             const movieCategories = ['Drama', 'Thriller', 'Adventure', 'Comedy'];
             const query = movieCategories.map(cat => `category=${encodeURIComponent(cat)}`).join('&');
-            loadContent(`/api/content?${query}`, 'moviesContainer', 'Movies');
+            loadContent(`${API_BASE_URL}/api/content?${query}`, 'moviesContainer', 'Movies');
 
             const searchInputs = [document.getElementById('searchInput'), document.getElementById('mobileSearchInput')];
             searchInputs.forEach(input => {
@@ -193,7 +195,7 @@
                             <div class="content-card" data-video-src="${item.video}" data-id="${item._id}">
                                 ${item.visibility === 'premium' ? '<div class="card-badge">PREMIUM</div>' : ''}
                                 <div class="card-image">
-                                    <img src="${item.thumbnail || '/api/placeholder/400/300'}" alt="${item.title}">
+                                    <img src="${item.thumbnail || `${API_BASE_URL}/api/placeholder/400/300`}" alt="${item.title}">
                                     <div class="card-overlay">
                                         <button class="play-btn"><i class="fas fa-play"></i></button>
                                     </div>
