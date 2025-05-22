@@ -15,10 +15,14 @@ async function loadWatchlist() {
         });
         const result = await response.json();
         if (response.ok) {
-            watchlist = result.watchlist;
+            watchlist = Array.isArray(result.watchlist) ? result.watchlist : [];
+        } else {
+            console.error('Failed to load watchlist:', result.message);
+            watchlist = [];
         }
     } catch (error) {
         console.error('Error loading watchlist:', error);
+        watchlist = [];
     }
 }
 
@@ -42,6 +46,12 @@ function initVideoPlayer() {
             }
 
             const contentId = card.dataset.id;
+            if (!contentId) {
+                utils.showNotification('Content ID is missing', 'error');
+                console.error('Content ID is undefined for card:', card);
+                return;
+            }
+
             const videoTitle = card.querySelector('h3')?.textContent || 'Untitled';
             const meta = card.querySelector('.meta')?.textContent || '';
             const description = card.querySelector('p')?.textContent || 'No description available';
@@ -85,6 +95,7 @@ function initVideoPlayer() {
             }
 
             if (watchlistBtn) {
+                console.log('watchlist before updateWatchlistButton:', watchlist);
                 updateWatchlistButton(watchlistBtn, contentId);
                 watchlistBtn.onclick = () => toggleWatchlist(
                     contentId, videoTitle, meta, card.querySelector('img')?.src, watchlistBtn
@@ -126,7 +137,7 @@ async function toggleWatchlist(contentId, title, meta, image, button) {
     }
 
     const token = localStorage.getItem('token');
-    const isInWatchlist = watchlist.some(item => item.contentId === contentId);
+    const isInWatchlist = Array.isArray(watchlist) && watchlist.some(item => item.contentId === contentId);
 
     try {
         if (isInWatchlist) {
@@ -136,7 +147,7 @@ async function toggleWatchlist(contentId, title, meta, image, button) {
             });
             const result = await res.json();
             if (res.ok) {
-                watchlist = result.watchlist;
+                watchlist = Array.isArray(result.watchlist) ? result.watchlist : [];
                 updateWatchlistButton(button, contentId);
                 utils.showNotification(`${title} removed from watchlist`, 'info');
             } else {
@@ -153,7 +164,7 @@ async function toggleWatchlist(contentId, title, meta, image, button) {
             });
             const result = await res.json();
             if (res.ok) {
-                watchlist = result.watchlist;
+                watchlist = Array.isArray(result.watchlist) ? result.watchlist : [];
                 updateWatchlistButton(button, contentId);
                 utils.showNotification(`${title} added to watchlist`, 'success');
             } else {
@@ -167,7 +178,7 @@ async function toggleWatchlist(contentId, title, meta, image, button) {
 }
 
 function updateWatchlistButton(button, contentId) {
-    const isInWatchlist = watchlist.some(item => item.contentId === contentId);
+    const isInWatchlist = Array.isArray(watchlist) && watchlist.some(item => item.contentId === contentId);
     button.innerHTML = isInWatchlist
         ? '<i class="fas fa-check"></i> Added to Watchlist'
         : '<i class="fas fa-plus"></i> Add to Watchlist';
