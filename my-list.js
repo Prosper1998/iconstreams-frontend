@@ -1,6 +1,6 @@
 import { API_BASE_URL } from './utils.js';
 import { loadContent } from './app.js';
-import { watchlist } from './auth.js';
+import { watchlist, isLoggedIn } from './auth.js';
 import { initVideoPlayer } from './player.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -11,7 +11,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadWatchlist() {
     const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!token) {
+        if (isLoggedIn.value) {
+            // If the user is logged in but there's no token, log them out
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('currentUser');
+            isLoggedIn.value = false;
+            utils.showNotification('Session expired. Please sign in again.', 'warning');
+            utils.showModal(document.getElementById('loginModal'));
+        }
+        return;
+    }
 
     try {
         const response = await fetch(`${API_BASE_URL}/api/content/watchlist`, {
@@ -25,6 +35,15 @@ async function loadWatchlist() {
             console.error('Failed to load watchlist:', result.message);
             watchlist.value = [];
             localStorage.setItem('watchlist', JSON.stringify(watchlist.value));
+            if (response.status === 401) {
+                // Clear invalid token and prompt for login
+                localStorage.removeItem('token');
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('currentUser');
+                isLoggedIn.value = false;
+                utils.showNotification('Session expired. Please sign in again.', 'warning');
+                utils.showModal(document.getElementById('loginModal'));
+            }
         }
     } catch (error) {
         console.error('Failed to load watchlist:', error);

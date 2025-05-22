@@ -1,5 +1,6 @@
 import { API_BASE_URL, utils } from './utils.js';
 import { isLoggedIn, currentUser, watchlist, updateAuthUI, signOut } from './auth.js';
+import { initVideoPlayer } from './player.js'; // Import initVideoPlayer
 
 window.addEventListener('load', () => {
     document.body.classList.add('loaded');
@@ -57,6 +58,10 @@ export async function loadContent(endpoint, containerId, typeLabel = "Content") 
     try {
         const res = await fetch(endpoint);
         const items = await res.json();
+
+        if (!res.ok) {
+            throw new Error(`Failed to fetch ${typeLabel}: ${items.message || res.statusText}`);
+        }
 
         if (!Array.isArray(items)) throw new Error("API response is not an array");
 
