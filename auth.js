@@ -1,4 +1,5 @@
 import { API_BASE_URL, utils } from './utils.js';
+import { showSettingsModal } from './ui.js'; // Ensure this import is present
 
 // Shared state using objects to allow reactivity across modules
 export const isLoggedIn = { value: false };
@@ -25,7 +26,7 @@ export function initAuth() {
 
     if (signInBtn) signInBtn.addEventListener('click', () => {
         if (isLoggedIn.value) {
-            showSettingsModal();
+            showSettingsModal(); // Now defined
         } else {
             utils.showModal(elements.loginModal);
         }
@@ -238,7 +239,6 @@ export function updateMobileMenuAuth() {
 
 document.addEventListener('DOMContentLoaded', initAuth);
 
-// Payment-related functions (previously in a separate auth.js snippet)
 export function showPaymentOptions(name, email) {
     if (!elements.paymentModal) {
         createPaymentModal();
