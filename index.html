@@ -1,187 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ICON Streaming</title>
-  <link rel="stylesheet" href="main.css" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>ICON - Local Content</title>
+    <link rel="stylesheet" href="main.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
 </head>
 <body>
-  <div class="loading"><div class="loading-spinner"></div></div>
-
-  <nav>
-    <div class="nav-container">
-      <div class="logo">ICON</div>
-      <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
-      <div class="nav-links">
-        <a href="index.html" class="active">Home</a>
-        <a href="movies.html">Movies</a>
-        <a href="tv-shows.html">TV Shows</a>
-        <a href="local.html">Local</a>
-        <a href="my-list.html">My List</a>
-      </div>
-      <div class="nav-actions">
-        <div class="search-container">
-          <input type="text" placeholder="Search..." id="searchInput" />
-          <button class="search-btn"><i class="fas fa-search"></i></button>
-        </div>
-        <button class="btn primary sign-in-btn">Sign In</button>
-        <button class="btn secondary sign-up-btn">Sign Up</button>
-      </div>
+    <div class="loading">
+        <div class="loading-spinner"></div>
     </div>
-  </nav>
 
-  <div class="mobile-menu-overlay">
-    <div class="mobile-menu-container">
-      <div class="mobile-menu-header">
-        <div class="logo">ICON</div>
-        <button class="mobile-menu-close"><i class="fas fa-times"></i></button>
-      </div>
-      <div class="mobile-menu-links">
-        <a href="index.html" class="active">Home</a>
-        <a href="movies.html">Movies</a>
-        <a href="tv-shows.html">TV Shows</a>
-        <a href="local.html">Local</a>
-        <a href="my-list.html">My List</a>
-      </div>
-      <div class="mobile-search">
-        <div class="search-container">
-          <input type="text" placeholder="Search..." id="mobileSearchInput" />
-          <button class="search-btn"><i class="fas fa-search"></i></button>
-        </div>
-      </div>
-      <div class="mobile-menu-footer">
-        <a href="#" class="mobile-signin-link"><i class="fas fa-sign-in-alt"></i> Sign In</a>
-        <a href="#"><i class="fas fa-info-circle"></i> About</a>
-        <a href="#"><i class="fas fa-question-circle"></i> Help</a>
-      </div>
-    </div>
-  </div>
-
-  <main id="homepageContent"></main>
-
-  <div id="videoModal" class="modal">
-    <div class="modal-content">
-      <span class="close-btn"><i class="fas fa-times"></i></span>
-      <video id="iconPlayer" controls preload="auto" width="900" height="500">
-        <source src="" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-      <div class="video-info">
-        <h3>Video Title</h3>
-        <div class="meta">
-          <span>Year</span>
-          <div class="meta-dot"></div>
-          <span>Genre</span>
-          <div class="meta-dot"></div>
-          <span>Duration</span>
-        </div>
-        <p class="video-description">Video description will appear here.</p>
-        <div class="video-actions">
-          <button class="btn primary"><i class="fas fa-plus"></i> Add to Watchlist</button>
-          <button class="btn secondary"><i class="fas fa-share-alt"></i> Share</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="authBackground" class="auth-background"><div class="background-overlay"></div></div>
-
-  <!-- Login and Signup modals omitted for brevity; already correct -->
-
-  <div id="notificationContainer"></div>
-
-  <script src="utils.js"></script>
-  <script src="auth.js"></script>
-  <script src="app.js"></script>
-  <script src="player.js"></script>
-  <script src="payment.js"></script>
-  <script src="ui.js"></script>
-  <script>
-    const API_BASE_URL = 'https://iconstreams-backend.onrender.com';
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/content`);
-        const data = await res.json();
-        if (!Array.isArray(data)) throw new Error("Invalid content format");
-
-        const grouped = data.reduce((acc, item) => {
-          const key = item.category || "Uncategorized";
-          acc[key] = acc[key] || [];
-          acc[key].push(item);
-          return acc;
-        }, {});
-
-        const mainContent = document.getElementById('homepageContent');
-        Object.entries(grouped).forEach(([category, items]) => {
-          const section = document.createElement('section');
-          section.className = 'content-section';
-          const containerId = `${category.toLowerCase().replace(/\s+/g, '-')}-container`;
-          section.innerHTML = `
-            <div class="section-header">
-              <h2 class="section-title">${category}</h2>
-              <a href="#" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
+    <nav>
+        <div class="nav-container">
+            <div class="logo">ICON</div>
+            <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="movies.html">Movies</a>
+                <a href="tv-shows.html">TV Shows</a>
+                <a href="local.html" class="active">Local</a>
+                <a href="my-list.html">My List</a>
             </div>
-            <div class="content-slider" id="${containerId}"></div>
-          `;
-          mainContent.appendChild(section);
-          loadContent(`${API_BASE_URL}/api/content?category=${encodeURIComponent(category)}`, containerId, category);
-        });
+            <div class="nav-actions">
+                <div class="search-container">
+                    <input type="text" placeholder="Search..." id="searchInput" />
+                    <button class="search-btn"><i class="fas fa-search"></i></button>
+                </div>
+                <button class="btn primary sign-in-btn">Sign In</button>
+                <button class="btn secondary sign-up-btn">Sign Up</button>
+            </div>
+        </div>
+    </nav>
 
-        document.querySelector('.loading').classList.add('loaded');
+    <div class="mobile-menu-overlay">
+        <div class="mobile-menu-container">
+            <div class="mobile-menu-header">
+                <div class="logo">ICON</div>
+                <button class="mobile-menu-close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="mobile-menu-links">
+                <a href="index.html">Home</a>
+                <a href="movies.html">Movies</a>
+                <a href="tv-shows.html">TV Shows</a>
+                <a href="local.html" class="active">Local</a>
+                <a href="my-list.html">My List</a>
+            </div>
+            <div class="mobile-search">
+                <div class="search-container">
+                    <input type="text" placeholder="Search..." id="mobileSearchInput" />
+                    <button class="search-btn"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            <div class="mobile-menu-footer">
+                <a href="#" class="mobile-signin-link"><i class="fas fa-sign-in-alt"></i> Sign In</a>
+                <a href="#"><i class="fas fa-info-circle"></i> About</a>
+                <a href="#"><i class="fas fa-question-circle"></i> Help</a>
+            </div>
+        </div>
+    </div>
 
-        const searchInputs = [document.getElementById('searchInput'), document.getElementById('mobileSearchInput')];
-        searchInputs.forEach(input => {
-          input?.addEventListener('input', async () => {
-            const query = input.value.trim().toLowerCase();
-            if (query.length < 3) return;
-            try {
-              const res = await fetch(`${API_BASE_URL}/api/content`);
-              const data = await res.json();
-              const filtered = data.filter(item => item.title.toLowerCase().includes(query));
-              Object.keys(grouped).forEach(category => {
-                const containerId = `${category.toLowerCase().replace(/\s+/g, '-')}-container`;
-                const container = document.getElementById(containerId);
-                if (container) {
-                  container.innerHTML = filtered
-                    .filter(item => item.category === category)
-                    .map(item => `
-                      <div class="content-card" data-video-src="${item.video}" data-id="${item._id}">
-                        ${item.visibility === 'premium' ? '<div class="card-badge">PREMIUM</div>' : ''}
-                        <div class="card-image">
-                          <img src="${item.thumbnail || `${API_BASE_URL}/api/placeholder/400/300`}" alt="${item.title}" />
-                          <div class="card-overlay">
-                            <button class="play-btn"><i class="fas fa-play"></i></button>
-                          </div>
-                        </div>
-                        <div class="card-info">
-                          <h3>${item.title}</h3>
-                          <div class="meta">
-                            <span>${item.releaseYear || 'N/A'}</span>
-                            <div class="meta-dot"></div>
-                            <span>${item.category}</span>
-                            <div class="meta-dot"></div>
-                            <span>${item.duration}m</span>
-                          </div>
-                          <p>${item.description.slice(0, 100)}${item.description.length > 100 ? '...' : ''}</p>
-                        </div>
-                      </div>
-                    `).join('') || `<p class="empty-message">No results for "${query}" in ${category}.</p>`;
-                }
-              });
-            } catch (error) {
-              console.error('Search error:', error);
-              utils.showNotification('Error searching content', 'error');
-            }
-          });
-        });
-      } catch (err) {
-        console.error('Error loading content:', err);
-        document.querySelector('.loading').innerHTML = '<p style="color: white">Failed to load content.</p>';
-      }
-    });
-  </script>
+    <section class="content-section">
+        <div class="section-header">
+            <h2 class="section-title">Local Zambian Content</h2>
+            <a href="#" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
+        </div>
+        <div id="localContainer" class="content-slider"></div>
+    </section>
+
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn"><i class="fas fa-times"></i></span>
+            <video id="iconPlayer" controls preload="auto" width="900" height="500">
+                <source src="" type="video/mp4" />
+                Your browser does not support the video tag.
+            </video>
+            <div class="video-info">
+                <h3>Video Title</h3>
+                <div class="meta">
+                    <span>Year</span>
+                    <div class="meta-dot"></div>
+                    <span>Genre</span>
+                    <div class="meta-dot"></div>
+                    <span>Duration</span>
+                </div>
+                <p class="video-description">Video description will appear here.</p>
+                <div class="video-actions">
+                    <button class="btn primary"><i class="fas fa-plus"></i> Add to Watchlist</button>
+                    <button class="btn secondary"><i class="fas fa-share-alt"></i> Share</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="authBackground" class="auth-background">
+        <div class="background-overlay"></div>
+    </div>
+
+    <!-- Login and Signup modals (unchanged) -->
+    <div id="notificationContainer"></div>
+
+    <!-- Load scripts as modules -->
+    <script type="module" src="utils.js"></script>
+    <script type="module" src="auth.js"></script>
+    <script type="module" src="app.js"></script>
+    <script type="module" src="player.js"></script>
+    <script type="module" src="payment.js"></script>
+    <script type="module" src="ui.js"></script>
+    <script type="module" src="local.js"></script>
 </body>
 </html>

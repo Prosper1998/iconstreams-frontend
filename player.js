@@ -1,3 +1,5 @@
+import { API_BASE_URL, utils } from './utils.js';
+
 let watchlist = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -46,6 +48,7 @@ function initVideoPlayer() {
             }
 
             const contentId = card.dataset.id;
+            console.log('contentId:', contentId); // Debugging line
             if (!contentId) {
                 utils.showNotification('Content ID is missing', 'error');
                 console.error('Content ID is undefined for card:', card);

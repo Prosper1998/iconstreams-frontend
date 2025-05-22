@@ -1,6 +1,6 @@
-const API_BASE_URL = "https://iconstreams-backend.onrender.com";
+export const API_BASE_URL = "https://iconstreams-backend.onrender.com";
 
-const utils = {
+export const utils = {
     showNotification(message, type = 'info') {
         const notificationContainer = document.getElementById('notificationContainer') || document.body;
         const notification = document.createElement('div');
