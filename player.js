@@ -1,3 +1,33 @@
+import { API_BASE_URL, utils } from './utils.js';
+import { isLoggedIn, watchlist, elements } from './auth.js';
+import { updateWatchlistDisplay } from './ui.js';
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadWatchlist();
+    initVideoPlayer();
+});
+
+async function loadWatchlist() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/content/watchlist`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await response.json();
+        if (response.ok) {
+            watchlist.value = Array.isArray(result.watchlist) ? result.watchlist : [];
+        } else {
+            console.error('Failed to load watchlist:', result.message);
+            watchlist.value = [];
+        }
+    } catch (error) {
+        console.error('Error loading watchlist:', error);
+        watchlist.value = [];
+    }
+}
+
 export function initVideoPlayer() {
     const playButtons = document.querySelectorAll('.play-btn');
     const videoCloseBtn = document.querySelector('.close-btn');
@@ -29,7 +59,7 @@ export function initVideoPlayer() {
             const meta = card.querySelector('.meta')?.textContent || '';
             const description = card.querySelector('p')?.textContent || 'No description available';
             const videoSource = card.dataset.videoSrc;
-            console.log('videoSource:', videoSource); // Add this log
+            console.log('videoSource:', videoSource);
 
             if (!videoSource) {
                 utils.showNotification('Video source not available', 'error');
@@ -78,5 +108,86 @@ export function initVideoPlayer() {
         });
     });
 
-    // ... (rest of the function unchanged)
+    if (videoCloseBtn) {
+        videoCloseBtn.addEventListener('click', () => {
+            const videoElement = document.getElementById('iconPlayer');
+            if (videoElement) videoElement.pause();
+            if (videoModal) videoModal.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+    }
+
+    if (shareBtn) {
+        shareBtn.addEventListener('click', () => {
+            const title = videoModal?.querySelector('.video-info h3')?.textContent || 'ICON content';
+            if (navigator.share) {
+                navigator.share({
+                    title,
+                    text: `Check out ${title} on ICON Streaming!`,
+                    url: window.location.href
+                }).catch(err => console.error('Error sharing:', err));
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                utils.showNotification('Link copied to clipboard', 'info');
+            }
+        });
+    }
+}
+
+export async function toggleWatchlist(contentId, title, meta, image, button) {
+    if (!isLoggedIn.value) {
+        utils.showModal(elements.loginModal);
+        return;
+    }
+
+    const token = localStorage.getItem('token');
+    const isInWatchlist = Array.isArray(watchlist.value) && watchlist.value.some(item => item.contentId === contentId);
+
+    try {
+        if (isInWatchlist) {
+            const res = await fetch(`${API_BASE_URL}/api/content/watchlist/${contentId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const result = await res.json();
+            if (res.ok) {
+                watchlist.value = Array.isArray(result.watchlist) ? result.watchlist : [];
+                localStorage.setItem('watchlist', JSON.stringify(watchlist.value));
+                updateWatchlistButton(button, contentId);
+                updateWatchlistDisplay();
+                utils.showNotification(`${title} removed from watchlist`, 'info');
+            } else {
+                utils.showNotification(result.message || 'Error removing from watchlist', 'error');
+            }
+        } else {
+            const res = await fetch(`${API_BASE_URL}/api/content/watchlist`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ contentId })
+            });
+            const result = await res.json();
+            if (res.ok) {
+                watchlist.value = Array.isArray(result.watchlist) ? result.watchlist : [];
+                localStorage.setItem('watchlist', JSON.stringify(watchlist.value));
+                updateWatchlistButton(button, contentId);
+                updateWatchlistDisplay();
+                utils.showNotification(`${title} added to watchlist`, 'success');
+            } else {
+                utils.showNotification(result.message || 'Error adding to watchlist', 'error');
+            }
+        }
+    } catch (err) {
+        console.error('Watchlist toggle error:', err);
+        utils.showNotification('Error updating watchlist', 'error');
+    }
+}
+
+export function updateWatchlistButton(button, contentId) {
+    const isInWatchlist = Array.isArray(watchlist.value) && watchlist.value.some(item => item.contentId === contentId);
+    button.innerHTML = isInWatchlist
+        ? '<i class="fas fa-check"></i> Added to Watchlist'
+        : '<i class="fas fa-plus"></i> Add to Watchlist';
 }
