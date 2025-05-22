@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>ICON - Local Content</title>
+    <title>ICON - Home</title>
     <link rel="stylesheet" href="main.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
 </head>
@@ -17,10 +17,10 @@
             <div class="logo">ICON</div>
             <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
             <div class="nav-links">
-                <a href="index.html">Home</a>
+                <a href="index.html" class="active">Home</a>
                 <a href="movies.html">Movies</a>
                 <a href="tv-shows.html">TV Shows</a>
-                <a href="local.html" class="active">Local</a>
+                <a href="local.html">Local</a>
                 <a href="my-list.html">My List</a>
             </div>
             <div class="nav-actions">
@@ -41,10 +41,10 @@
                 <button class="mobile-menu-close"><i class="fas fa-times"></i></button>
             </div>
             <div class="mobile-menu-links">
-                <a href="index.html">Home</a>
+                <a href="index.html" class="active">Home</a>
                 <a href="movies.html">Movies</a>
                 <a href="tv-shows.html">TV Shows</a>
-                <a href="local.html" class="active">Local</a>
+                <a href="local.html">Local</a>
                 <a href="my-list.html">My List</a>
             </div>
             <div class="mobile-search">
@@ -63,10 +63,10 @@
 
     <section class="content-section">
         <div class="section-header">
-            <h2 class="section-title">Local Zambian Content</h2>
+            <h2 class="section-title">Featured Content</h2>
             <a href="#" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
         </div>
-        <div id="localContainer" class="content-slider"></div>
+        <div id="featuredContainer" class="content-slider"></div>
     </section>
 
     <div id="videoModal" class="modal">
@@ -98,16 +98,79 @@
         <div class="background-overlay"></div>
     </div>
 
-    <!-- Login and Signup modals (unchanged) -->
+    <div id="loginModal" class="auth-modal" role="dialog" aria-labelledby="loginModalTitle" aria-modal="true">
+        <div class="auth-modal-content">
+            <button class="auth-close-btn" aria-label="Close dialog"><i class="fas fa-times"></i></button>
+            <div class="auth-header">
+                <h1 id="loginModalTitle">Sign In</h1>
+            </div>
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <input type="email" id="loginEmail" name="email" placeholder="Email" required>
+                    <span class="error-message" id="loginEmailError"></span>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="loginPassword" name="password" placeholder="Password" required>
+                    <span class="error-message" id="loginPasswordError"></span>
+                </div>
+                <button type="submit" class="btn auth-btn">Sign In</button>
+                <div class="form-options">
+                    <label class="checkbox">
+                        <input type="checkbox" name="remember"> Remember me
+                    </label>
+                    <a href="#" class="help-link">Need help?</a>
+                </div>
+            </form>
+            <div class="auth-footer">
+                <p>New to ICON? <a href="#" id="showSignup">Sign up now</a>.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="signupModal" class="auth-modal" role="dialog" aria-labelledby="signupModalTitle" aria-modal="true">
+        <div class="auth-modal-content">
+            <button class="auth-close-btn" aria-label="Close dialog"><i class="fas fa-times"></i></button>
+            <div class="auth-header">
+                <h1 id="signupModalTitle">Sign Up</h1>
+            </div>
+            <form id="signupForm" class="auth-form">
+                <div class="form-group">
+                    <input type="text" id="signupName" name="name" placeholder="Full Name" required>
+                    <span class="error-message" id="signupNameError"></span>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="signupEmail" name="email" placeholder="Email" required>
+                    <span class="error-message" id="signupEmailError"></span>
+                </div>
+                <div class="form-group">
+                    <input type="tel" id="signupPhone" name="phone" placeholder="Phone Number" required>
+                    <span class="error-message" id="signupPhoneError"></span>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="signupPassword" name="password" placeholder="Password" required>
+                    <span class="error-message" id="signupPasswordError"></span>
+                </div>
+                <div class="form-options">
+                    <label class="checkbox">
+                        <input type="checkbox" name="terms" required> I agree to the <a href="#">Terms of Service</a>
+                    </label>
+                </div>
+                <button type="submit" class="btn auth-btn">Sign Up</button>
+            </form>
+            <div class="auth-footer">
+                <p>Already a member? <a href="#" id="showLogin">Sign in now</a>.</p>
+            </div>
+        </div>
+    </div>
+
     <div id="notificationContainer"></div>
 
-    <!-- Load scripts as modules -->
     <script type="module" src="utils.js"></script>
     <script type="module" src="auth.js"></script>
     <script type="module" src="app.js"></script>
     <script type="module" src="player.js"></script>
     <script type="module" src="payment.js"></script>
     <script type="module" src="ui.js"></script>
-    <script type="module" src="local.js"></script>
+    <script type="module" src="index.js"></script>
 </body>
 </html>
