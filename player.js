@@ -1,6 +1,6 @@
 import { API_BASE_URL, utils } from './utils.js';
-
-let watchlist = [];
+import { isLoggedIn, watchlist, elements } from './auth.js';
+import { updateWatchlistDisplay } from './ui.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadWatchlist();
@@ -17,14 +17,14 @@ async function loadWatchlist() {
         });
         const result = await response.json();
         if (response.ok) {
-            watchlist = Array.isArray(result.watchlist) ? result.watchlist : [];
+            watchlist.value = Array.isArray(result.watchlist) ? result.watchlist : [];
         } else {
             console.error('Failed to load watchlist:', result.message);
-            watchlist = [];
+            watchlist.value = [];
         }
     } catch (error) {
         console.error('Error loading watchlist:', error);
-        watchlist = [];
+        watchlist.value = [];
     }
 }
 
@@ -41,9 +41,9 @@ function initVideoPlayer() {
             const card = this.closest('.content-card');
             if (!card) return;
 
-            if (!isLoggedIn) {
+            if (!isLoggedIn.value) {
                 utils.showNotification('Please sign in to watch content', 'warning');
-                utils.showModal(document.getElementById('loginModal'));
+                utils.showModal(elements.loginModal);
                 return;
             }
 
@@ -82,7 +82,7 @@ function initVideoPlayer() {
             if (videoElement) {
                 const source = videoElement.querySelector('source');
                 source.src = videoSource;
-                source.type = 'video/mp4';
+                source.type = videoSource.includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4';
                 videoElement.load();
             }
 
@@ -98,7 +98,7 @@ function initVideoPlayer() {
             }
 
             if (watchlistBtn) {
-                console.log('watchlist before updateWatchlistButton:', watchlist);
+                console.log('watchlist before updateWatchlistButton:', watchlist.value);
                 updateWatchlistButton(watchlistBtn, contentId);
                 watchlistBtn.onclick = () => toggleWatchlist(
                     contentId, videoTitle, meta, card.querySelector('img')?.src, watchlistBtn
@@ -133,14 +133,14 @@ function initVideoPlayer() {
     }
 }
 
-async function toggleWatchlist(contentId, title, meta, image, button) {
-    if (!isLoggedIn) {
-        utils.showModal(document.getElementById('loginModal'));
+export async function toggleWatchlist(contentId, title, meta, image, button) {
+    if (!isLoggedIn.value) {
+        utils.showModal(elements.loginModal);
         return;
     }
 
     const token = localStorage.getItem('token');
-    const isInWatchlist = Array.isArray(watchlist) && watchlist.some(item => item.contentId === contentId);
+    const isInWatchlist = Array.isArray(watchlist.value) && watchlist.value.some(item => item.contentId === contentId);
 
     try {
         if (isInWatchlist) {
@@ -150,8 +150,10 @@ async function toggleWatchlist(contentId, title, meta, image, button) {
             });
             const result = await res.json();
             if (res.ok) {
-                watchlist = Array.isArray(result.watchlist) ? result.watchlist : [];
+                watchlist.value = Array.isArray(result.watchlist) ? result.watchlist : [];
+                localStorage.setItem('watchlist', JSON.stringify(watchlist.value));
                 updateWatchlistButton(button, contentId);
+                updateWatchlistDisplay();
                 utils.showNotification(`${title} removed from watchlist`, 'info');
             } else {
                 utils.showNotification(result.message || 'Error removing from watchlist', 'error');
@@ -167,8 +169,10 @@ async function toggleWatchlist(contentId, title, meta, image, button) {
             });
             const result = await res.json();
             if (res.ok) {
-                watchlist = Array.isArray(result.watchlist) ? result.watchlist : [];
+                watchlist.value = Array.isArray(result.watchlist) ? result.watchlist : [];
+                localStorage.setItem('watchlist', JSON.stringify(watchlist.value));
                 updateWatchlistButton(button, contentId);
+                updateWatchlistDisplay();
                 utils.showNotification(`${title} added to watchlist`, 'success');
             } else {
                 utils.showNotification(result.message || 'Error adding to watchlist', 'error');
@@ -180,9 +184,86 @@ async function toggleWatchlist(contentId, title, meta, image, button) {
     }
 }
 
-function updateWatchlistButton(button, contentId) {
-    const isInWatchlist = Array.isArray(watchlist) && watchlist.some(item => item.contentId === contentId);
+export function updateWatchlistButton(button, contentId) {
+    const isInWatchlist = Array.isArray(watchlist.value) && watchlist.value.some(item => item.contentId === contentId);
     button.innerHTML = isInWatchlist
         ? '<i class="fas fa-check"></i> Added to Watchlist'
         : '<i class="fas fa-plus"></i> Add to Watchlist';
+}
+
+export function initVideoPlayer() {
+    const playButtons = document.querySelectorAll('.play-btn');
+    playButtons.forEach(button => {
+        button.addEventListener('click', async function (e) {
+            e.preventDefault();
+            const card = this.closest('.content-card');
+            if (!card) return;
+
+            if (!isLoggedIn.value) {
+                utils.showNotification('Please sign in to watch content', 'warning');
+                utils.showModal(elements.loginModal);
+                return;
+            }
+
+            const contentId = card.dataset.id;
+            console.log('contentId:', contentId); // Debugging line
+            if (!contentId) {
+                utils.showNotification('Content ID is missing', 'error');
+                console.error('Content ID is undefined for card:', card);
+                return;
+            }
+
+            const videoTitle = card.querySelector('h3')?.textContent || 'Untitled';
+            const meta = card.querySelector('.meta')?.textContent || '';
+            const description = card.querySelector('p')?.textContent || 'No description available';
+            const videoSource = card.dataset.videoSrc;
+
+            if (!videoSource) {
+                utils.showNotification('Video source not available', 'error');
+                return;
+            }
+
+            const videoModal = document.getElementById('videoModal');
+            const modalTitle = videoModal?.querySelector('.video-info h3');
+            const modalMeta = videoModal?.querySelector('.video-info .meta');
+            const modalDescription = videoModal?.querySelector('.video-info .video-description');
+            const watchlistBtn = videoModal?.querySelector('.video-actions .btn.primary');
+
+            if (modalTitle) modalTitle.textContent = videoTitle;
+            if (modalMeta) {
+                const metaParts = meta.split('•').map(part => part.trim()).filter(Boolean);
+                modalMeta.innerHTML = metaParts.map((part, i) =>
+                    `<span>${part}</span>${i < metaParts.length - 1 ? '<div class="meta-dot"></div>' : ''}`
+                ).join('');
+            }
+            if (modalDescription) modalDescription.textContent = description;
+
+            const videoElement = document.getElementById('iconPlayer');
+            if (videoElement) {
+                const source = videoElement.querySelector('source');
+                source.src = videoSource;
+                source.type = videoSource.includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4';
+                videoElement.load();
+            }
+
+            if (videoModal) {
+                videoModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+
+            try {
+                await fetch(`${API_BASE_URL}/api/content/${contentId}/view`, { method: 'POST' });
+            } catch (error) {
+                console.error('Error incrementing view count:', error);
+            }
+
+            if (watchlistBtn) {
+                console.log('watchlist before updateWatchlistButton:', watchlist.value);
+                updateWatchlistButton(watchlistBtn, contentId);
+                watchlistBtn.onclick = () => toggleWatchlist(
+                    contentId, videoTitle, meta, card.querySelector('img')?.src, watchlistBtn
+                );
+            }
+        });
+    });
 }

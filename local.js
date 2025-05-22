@@ -1,7 +1,10 @@
 import { API_BASE_URL, utils } from './utils.js';
+import { loadContent } from './app.js';
+import { initVideoPlayer } from './player.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     loadContent(`${API_BASE_URL}/api/content?tags=local`, 'localContainer', 'Local Content');
+    initVideoPlayer();
 
     const searchInputs = [document.getElementById('searchInput'), document.getElementById('mobileSearchInput')];
     searchInputs.forEach(input => {

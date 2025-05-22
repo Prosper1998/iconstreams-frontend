@@ -1,5 +1,9 @@
-async function showWatchlistModal() {
-    if (!isLoggedIn) {
+import { API_BASE_URL, utils } from './utils.js';
+import { isLoggedIn, watchlist, elements, currentUser } from './auth.js';
+import { toggleWatchlist, updateWatchlistButton } from './player.js';
+
+export async function showWatchlistModal() {
+    if (!isLoggedIn.value) {
         utils.showModal(elements.loginModal);
         return;
     }
@@ -13,10 +17,10 @@ async function showWatchlistModal() {
         const response = await fetch(`${API_BASE_URL}/api/content/watchlist`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        watchlist = await response.json();
+        watchlist.value = await response.json();
     } catch (error) {
         console.error('Error loading watchlist:', error);
-        watchlist = [];
+        watchlist.value = [];
     }
 
     elements.authBackground.style.display = 'block';
@@ -74,13 +78,13 @@ function createWatchlistModal() {
     filterSelect.addEventListener('change', updateWatchlistDisplay);
 }
 
-function updateWatchlistDisplay() {
+export function updateWatchlistDisplay() {
     const watchlistItemsContainer = document.getElementById('watchlistItems');
     const sortSelect = document.getElementById('watchlistSort');
     const filterSelect = document.getElementById('watchlistFilter');
     if (!watchlistItemsContainer) return;
 
-    let filteredList = [...watchlist];
+    let filteredList = [...watchlist.value];
 
     const selectedGenre = filterSelect.value;
     if (selectedGenre !== 'all') {
@@ -110,9 +114,9 @@ function updateWatchlistDisplay() {
 
     watchlistItemsContainer.innerHTML = filteredList.map(item => `
         <div class="watchlist-item" data-id="${item.contentId}">
-            <img src="${item.image || '/api/placeholder/100/60'}" alt="${item.title}">
+            <img src="${item.image || `${API_BASE_URL}/api/placeholder/100/60`}" alt="${item.title}">
             <div class="watchlist-item-info">
-                <h4>${item.title}</h4>
+                <h3>${item.title}</h3>
                 <p>${item.meta}</p>
             </div>
             <button class="btn secondary remove-watchlist-btn" data-id="${item.contentId}">
@@ -132,7 +136,7 @@ function updateWatchlistDisplay() {
                 });
                 const result = await response.json();
                 if (response.ok) {
-                    watchlist = result.watchlist;
+                    watchlist.value = result.watchlist;
                     updateWatchlistDisplay();
                     utils.showNotification('Removed from watchlist', 'info');
                 } else {
@@ -177,14 +181,14 @@ function updateWatchlistDisplay() {
 
                 const videoElement = document.getElementById('iconPlayer');
                 videoElement.querySelector('source').src = content.video;
-                videoElement.querySelector('source').type = 'video/mp4';
+                videoElement.querySelector('source').type = content.video.includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4';
                 videoElement.load();
 
                 videoModal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
 
                 updateWatchlistButton(watchlistBtn, contentId);
-                watchlistBtn.onclick = () => toggleWatchlist(contentId, content.title, `${content.releaseYear} • ${content.category} • ${content.duration}m`, content.thumbnail, watchlistBtn);
+                watchlistBtn.onclick = () => toggleWatchlist(contentId, content.title, `${content.releaseYear || 'N/A'} • ${content.category} • ${content.duration}m`, content.thumbnail, watchlistBtn);
 
                 await fetch(`${API_BASE_URL}/api/content/${contentId}/view`, { method: 'POST' });
             } catch (error) {
@@ -195,8 +199,8 @@ function updateWatchlistDisplay() {
     });
 }
 
-async function showSettingsModal() {
-    if (!isLoggedIn) {
+export async function showSettingsModal() {
+    if (!isLoggedIn.value) {
         utils.showModal(elements.loginModal);
         return;
     }
@@ -225,11 +229,11 @@ function createSettingsModal() {
                     <h3>Account Settings</h3>
                     <div class="settings-item">
                         <label for="userEmail">Email</label>
-                        <input type="email" id="userEmail" value="${currentUser.email}" readonly>
+                        <input type="email" id="userEmail" value="${currentUser.value?.email || ''}" readonly>
                     </div>
                     <div class="settings-item">
                         <label for="userName">Name</label>
-                        <input type="text" id="userName" value="${currentUser.name}">
+                        <input type="text" id="userName" value="${currentUser.value?.name || ''}">
                     </div>
                     <div class="settings-item">
                         <label for="newPassword">New Password</label>
@@ -302,8 +306,8 @@ function createSettingsModal() {
 
                 const result = await response.json();
                 if (response.ok) {
-                    currentUser.name = newName;
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    currentUser.value.name = newName;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser.value));
                     updateAuthUI();
                     updateMobileMenuAuth();
                     utils.showNotification('Settings updated successfully', 'success');
