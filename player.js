@@ -1,185 +1,203 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ICON - Movies</title>
-    <link rel="stylesheet" href="main.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-</head>
-<body>
-    <div class="loading">
-        <div class="loading-spinner"></div>
-    </div>
+import { API_BASE_URL, BUNNY_BASE_URL, utils } from './utils.js';
+import { isLoggedIn, watchlist, elements } from './auth.js';
+import { updateWatchlistDisplay } from './ui.js';
 
-    <nav>
-        <div class="nav-container">
-            <div class="logo">ICON</div>
-            <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
-            <div class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="movies.html" class="active">Movies</a>
-                <a href="tv-shows.html">TV Shows</a>
-                <a href="local.html">Local</a>
-                <a href="my-list.html">My List</a>
-            </div>
-            <div class="nav-actions">
-                <div class="search-container">
-                    <input type="text" placeholder="Search..." id="searchInput">
-                    <button class="search-btn"><i class="fas fa-search"></i></button>
-                </div>
-                <button class="btn primary sign-in-btn">Sign In</button>
-                <button class="btn secondary sign-up-btn">Sign Up</button>
-            </div>
-        </div>
-    </nav>
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadWatchlist();
+    initVideoPlayer();
+});
 
-    <div class="mobile-menu-overlay">
-        <div class="mobile-menu-container">
-            <div class="mobile-menu-header">
-                <div class="logo">ICON</div>
-                <button class="mobile-menu-close"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="mobile-menu-links">
-                <a href="index.html">Home</a>
-                <a href="movies.html" class="active">Movies</a>
-                <a href="tv-shows.html">TV Shows</a>
-                <a href="local.html">Local</a>
-                <a href="my-list.html">My List</a>
-            </div>
-            <div class="mobile-search">
-                <div class="search-container">
-                    <input type="text" placeholder="Search..." id="mobileSearchInput">
-                    <button class="search-btn"><i class="fas fa-search"></i></button>
-                </div>
-            </div>
-            <div class="mobile-menu-footer">
-                <a href="#" class="mobile-signin-link"><i class="fas fa-sign-in-alt"></i> Sign In</a>
-                <a href="#"><i class="fas fa-info-circle"></i> About</a>
-                <a href="#"><i class="fas fa-question-circle"></i> Help</a>
-            </div>
-        </div>
-    </div>
+async function loadWatchlist() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
 
-    <!-- Featured movies / carousel -->
-    <section class="content-section">
-        <div class="section-header">
-            <h2 class="section-title">Movies</h2>
-            <a href="#" class="view-all">View All <i class="fas fa-chevron-right"></i></a>
-        </div>
-        <div id="moviesContainer" class="content-slider"></div>
-    </section>
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/content/watchlist`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const result = await response.json();
+        if (response.ok) {
+            watchlist.value = Array.isArray(result.watchlist) ? result.watchlist : [];
+        } else {
+            console.error('Failed to load watchlist:', result.message);
+            watchlist.value = [];
+        }
+    } catch (error) {
+        console.error('Error loading watchlist:', error);
+        watchlist.value = [];
+    }
+}
 
-    <!-- ✅ Movie Grid Layout Section -->
-    <section class="grid-section">
-        <div class="section-header">
-            <h2 class="section-title">Browse All Movies</h2>
-        </div>
-        <div id="movieGrid" class="movie-grid"></div>
-    </section>
+export function initVideoPlayer() {
+    const playButtons = document.querySelectorAll('.play-btn');
+    const videoCloseBtn = document.querySelector('.close-btn');
+    const videoModal = document.getElementById('videoModal');
+    const watchlistBtn = videoModal?.querySelector('.video-actions .btn.primary');
+    const shareBtn = videoModal?.querySelector('.video-actions .btn.secondary');
 
-    <div id="videoModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn"><i class="fas fa-times"></i></span>
-            <video id="iconPlayer" controls preload="auto" width="900" height="500">
-                <source src="" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-            <div class="video-info">
-                <h3>Video Title</h3>
-                <div class="meta">
-                    <span>Year</span>
-                    <div class="meta-dot"></div>
-                    <span>Genre</span>
-                    <div class="meta-dot"></div>
-                    <span>Duration</span>
-                </div>
-                <p class="video-description">Video description will appear here.</p>
-                <div class="video-actions">
-                    <button class="btn primary"><i class="fas fa-plus"></i> Add to Watchlist</button>
-                    <button class="btn secondary"><i class="fas fa-share-alt"></i> Share</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    playButtons.forEach(button => {
+        button.addEventListener('click', async function (e) {
+            e.preventDefault();
+            const card = this.closest('.content-card');
+            if (!card) return;
 
-    <div id="authBackground" class="auth-background">
-        <div class="background-overlay"></div>
-    </div>
+            if (!isLoggedIn.value) {
+                utils.showNotification('Please sign in to watch content', 'warning');
+                utils.showModal(elements.loginModal);
+                return;
+            }
 
-    <div id="loginModal" class="auth-modal" role="dialog" aria-labelledby="loginModalTitle" aria-modal="true">
-        <div class="auth-modal-content">
-            <button class="auth-close-btn" aria-label="Close dialog"><i class="fas fa-times"></i></button>
-            <div class="auth-header">
-                <h1 id="loginModalTitle">Sign In</h1>
-            </div>
-            <form id="loginForm" class="auth-form">
-                <div class="form-group">
-                    <input type="email" id="loginEmail" name="email" placeholder="Email" required>
-                    <span class="error-message" id="loginEmailError"></span>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="loginPassword" name="password" placeholder="Password" required>
-                    <span class="error-message" id="loginPasswordError"></span>
-                </div>
-                <button type="submit" class="btn auth-btn">Sign In</button>
-                <div class="form-options">
-                    <label class="checkbox">
-                        <input type="checkbox" name="remember"> Remember me
-                    </label>
-                    <a href="#" class="help-link">Need help?</a>
-                </div>
-            </form>
-            <div class="auth-footer">
-                <p>New to ICON? <a href="#" id="showSignup">Sign up now</a>.</p>
-            </div>
-        </div>
-    </div>
+            const contentId = card.dataset.id;
+            console.log('contentId:', contentId);
+            if (!contentId) {
+                utils.showNotification('Content ID is missing', 'error');
+                return;
+            }
 
-    <div id="signupModal" class="auth-modal" role="dialog" aria-labelledby="signupModalTitle" aria-modal="true">
-        <div class="auth-modal-content">
-            <button class="auth-close-btn" aria-label="Close dialog"><i class="fas fa-times"></i></button>
-            <div class="auth-header">
-                <h1 id="signupModalTitle">Sign Up</h1>
-            </div>
-            <form id="signupForm" class="auth-form">
-                <div class="form-group">
-                    <input type="text" id="signupName" name="name" placeholder="Full Name" required>
-                    <span class="error-message" id="signupNameError"></span>
-                </div>
-                <div class="form-group">
-                    <input type="email" id="signupEmail" name="email" placeholder="Email" required>
-                    <span class="error-message" id="signupEmailError"></span>
-                </div>
-                <div class="form-group">
-                    <input type="tel" id="signupPhone" name="phone" placeholder="Phone Number" required>
-                    <span class="error-message" id="signupPhoneError"></span>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="signupPassword" name="password" placeholder="Password" required>
-                    <span class="error-message" id="signupPasswordError"></span>
-                </div>
-                <div class="form-options">
-                    <label class="checkbox">
-                        <input type="checkbox" name="terms" required> I agree to the <a href="#">Terms of Service</a>
-                    </label>
-                </div>
-                <button type="submit" class="btn auth-btn">Sign Up</button>
-            </form>
-            <div class="auth-footer">
-                <p>Already a member? <a href="#" id="showLogin">Sign in now</a>.</p>
-            </div>
-        </div>
-    </div>
+            const videoTitle = card.querySelector('h3')?.textContent || 'Untitled';
+            const meta = card.querySelector('.meta')?.textContent || '';
+            const description = card.querySelector('p')?.textContent || 'No description available';
+            let videoSource = card.dataset.videoSrc || '';
 
-    <div id="notificationContainer"></div>
+            if (!videoSource) {
+                utils.showNotification('Video source not available', 'error');
+                return;
+            }
 
-    <script type="module" src="utils.js"></script>
-    <script type="module" src="auth.js"></script>
-    <script type="module" src="app.js"></script>
-    <script type="module" src="player.js"></script>
-    <script type="module" src="payment.js"></script>
-    <script type="module" src="ui.js"></script>
-    <script type="module" src="movies.js"></script>
-</body>
-</html>
+            if (!videoSource.startsWith('http')) {
+                videoSource = `${BUNNY_BASE_URL}/${videoSource}`;
+            }
+
+            videoSource = encodeURI(videoSource);
+            console.log('videoSource:', videoSource);
+
+            const modalTitle = videoModal?.querySelector('.video-info h3');
+            const modalMeta = videoModal?.querySelector('.video-info .meta');
+            const modalDescription = videoModal?.querySelector('.video-info .video-description');
+
+            if (modalTitle) modalTitle.textContent = videoTitle;
+            if (modalMeta) {
+                const metaParts = meta.split('•').map(part => part.trim()).filter(Boolean);
+                modalMeta.innerHTML = metaParts.map((part, i) =>
+                    `<span>${part}</span>${i < metaParts.length - 1 ? '<div class="meta-dot"></div>' : ''}`
+                ).join('');
+            }
+            if (modalDescription) modalDescription.textContent = description;
+
+            const videoElement = document.getElementById('iconPlayer');
+            if (videoElement) {
+                const source = videoElement.querySelector('source');
+                source.src = videoSource;
+                source.type = videoSource.includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4';
+                videoElement.load();
+
+                // 🟢 Try autoplay
+                videoElement.play().catch(err => {
+                    console.warn("Autoplay failed:", err);
+                    utils.showNotification('Tap play to start the video', 'info');
+                });
+            }
+
+            if (videoModal) {
+                videoModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+
+            try {
+                await fetch(`${API_BASE_URL}/api/content/${contentId}/view`, { method: 'POST' });
+            } catch (error) {
+                console.error('Error incrementing view count:', error);
+            }
+
+            if (watchlistBtn) {
+                updateWatchlistButton(watchlistBtn, contentId);
+                watchlistBtn.onclick = () => toggleWatchlist(
+                    contentId, videoTitle, meta, card.querySelector('img')?.src, watchlistBtn
+                );
+            }
+        });
+    });
+
+    if (videoCloseBtn) {
+        videoCloseBtn.addEventListener('click', () => {
+            const videoElement = document.getElementById('iconPlayer');
+            if (videoElement) videoElement.pause();
+            if (videoModal) videoModal.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+    }
+
+    if (shareBtn) {
+        shareBtn.addEventListener('click', () => {
+            const title = videoModal?.querySelector('.video-info h3')?.textContent || 'ICON content';
+            if (navigator.share) {
+                navigator.share({
+                    title,
+                    text: `Check out ${title} on ICON Streaming!`,
+                    url: window.location.href
+                }).catch(err => console.error('Error sharing:', err));
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                utils.showNotification('Link copied to clipboard', 'info');
+            }
+        });
+    }
+}
+
+export async function toggleWatchlist(contentId, title, meta, image, button) {
+    if (!isLoggedIn.value) {
+        utils.showModal(elements.loginModal);
+        return;
+    }
+
+    const token = localStorage.getItem('token');
+    const isInWatchlist = Array.isArray(watchlist.value) && watchlist.value.some(item => item.contentId === contentId);
+
+    try {
+        if (isInWatchlist) {
+            const res = await fetch(`${API_BASE_URL}/api/content/watchlist/${contentId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const result = await res.json();
+            if (res.ok) {
+                watchlist.value = Array.isArray(result.watchlist) ? result.watchlist : [];
+                localStorage.setItem('watchlist', JSON.stringify(watchlist.value));
+                updateWatchlistButton(button, contentId);
+                updateWatchlistDisplay();
+                utils.showNotification(`${title} removed from watchlist`, 'info');
+            } else {
+                utils.showNotification(result.message || 'Error removing from watchlist', 'error');
+            }
+        } else {
+            const res = await fetch(`${API_BASE_URL}/api/content/watchlist`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ contentId })
+            });
+            const result = await res.json();
+            if (res.ok) {
+                watchlist.value = Array.isArray(result.watchlist) ? result.watchlist : [];
+                localStorage.setItem('watchlist', JSON.stringify(watchlist.value));
+                updateWatchlistButton(button, contentId);
+                updateWatchlistDisplay();
+                utils.showNotification(`${title} added to watchlist`, 'success');
+            } else {
+                utils.showNotification(result.message || 'Error adding to watchlist', 'error');
+            }
+        }
+    } catch (err) {
+        console.error('Watchlist toggle error:', err);
+        utils.showNotification('Error updating watchlist', 'error');
+    }
+}
+
+export function updateWatchlistButton(button, contentId) {
+    const isInWatchlist = Array.isArray(watchlist.value) && watchlist.value.some(item => item.contentId === contentId);
+    button.innerHTML = isInWatchlist
+        ? '<i class="fas fa-check"></i> Added to Watchlist'
+        : '<i class="fas fa-plus"></i> Add to Watchlist';
+}
