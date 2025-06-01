@@ -1,4 +1,4 @@
-export const API_BASE_URL = "https://iconstreams-backend.onrender.com";
+export const API_BASE_URL = "https://iconstreams-backend-clean.onrender.com";
 
 export const utils = {
     showNotification(message, type = 'info') {
