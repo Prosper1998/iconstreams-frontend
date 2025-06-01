@@ -89,13 +89,19 @@ export function initVideoPlayer() {
                 const source = videoElement.querySelector('source');
                 source.src = videoSource;
                 source.type = videoSource.includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4';
+
+                // 🟡 Ensure autoplay works: mute first and wait for canplay
+                videoElement.muted = true;
                 videoElement.load();
 
-                // 🟢 Try autoplay
-                videoElement.play().catch(err => {
-                    console.warn("Autoplay failed:", err);
-                    utils.showNotification('Tap play to start the video', 'info');
-                });
+                const playHandler = () => {
+                    videoElement.play().catch(err => {
+                        console.warn("Autoplay failed:", err);
+                        utils.showNotification('Tap play to start the video', 'info');
+                    });
+                    videoElement.removeEventListener('canplay', playHandler);
+                };
+                videoElement.addEventListener('canplay', playHandler);
             }
 
             if (videoModal) {
