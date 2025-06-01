@@ -58,7 +58,9 @@ export function initVideoPlayer() {
             const videoTitle = card.querySelector('h3')?.textContent || 'Untitled';
             const meta = card.querySelector('.meta')?.textContent || '';
             const description = card.querySelector('p')?.textContent || 'No description available';
-            const videoSource = card.dataset.videoSrc;
+            let videoSource = card.dataset.videoSrc;
+            videoSource = encodeURI(videoSource);  // ✅ Fix: encode URL
+
             console.log('videoSource:', videoSource);
 
             if (!videoSource) {
