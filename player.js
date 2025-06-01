@@ -1,4 +1,4 @@
-import { API_BASE_URL, utils } from './utils.js';
+import { API_BASE_URL, BUNNY_BASE_URL, utils } from './utils.js';
 import { isLoggedIn, watchlist, elements } from './auth.js';
 import { updateWatchlistDisplay } from './ui.js';
 
@@ -58,15 +58,20 @@ export function initVideoPlayer() {
             const videoTitle = card.querySelector('h3')?.textContent || 'Untitled';
             const meta = card.querySelector('.meta')?.textContent || '';
             const description = card.querySelector('p')?.textContent || 'No description available';
-            let videoSource = card.dataset.videoSrc;
-            videoSource = encodeURI(videoSource);  // ✅ Fix: encode URL
-
-            console.log('videoSource:', videoSource);
+            let videoSource = card.dataset.videoSrc || '';
 
             if (!videoSource) {
                 utils.showNotification('Video source not available', 'error');
                 return;
             }
+
+            // 🛠 If not a full URL, prepend BUNNY_BASE_URL
+            if (!videoSource.startsWith('http')) {
+                videoSource = `${BUNNY_BASE_URL}/${videoSource}`; 
+            }
+
+            videoSource = encodeURI(videoSource);
+            console.log('videoSource:', videoSource);
 
             const modalTitle = videoModal?.querySelector('.video-info h3');
             const modalMeta = videoModal?.querySelector('.video-info .meta');

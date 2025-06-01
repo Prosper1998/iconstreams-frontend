@@ -1,4 +1,5 @@
 export const API_BASE_URL = "https://iconstreams-backend-clean.onrender.com";
+export const BUNNY_BASE_URL = "https://iconstreams-cdn.b-cdn.net"; // ✅ Use this when loading videos
 
 export const utils = {
     showNotification(message, type = 'info') {
