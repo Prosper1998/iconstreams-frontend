@@ -420,6 +420,28 @@ nav {
     background: rgba(255, 255, 255, 0.1);
 }
 
+/* Grid Layout for Movies Page */
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+@media screen and (max-width: 768px) {
+  .movies-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .movies-grid {
+    grid-template-columns: 1fr;
+    padding: 1rem 0.5rem;
+  }
+}
+
 .content-card {
     min-width: 280px;
     background: rgba(255, 255, 255, 0.05);
