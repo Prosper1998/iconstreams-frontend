@@ -1,3 +1,4 @@
+// player.js
 import { API_BASE_URL, BUNNY_BASE_URL, utils } from './utils.js';
 import { isLoggedIn, watchlist, elements } from './auth.js';
 import { updateWatchlistDisplay } from './ui.js';
@@ -30,10 +31,15 @@ async function loadWatchlist() {
 
 export function initVideoPlayer() {
     const playButtons = document.querySelectorAll('.play-btn');
-    const videoCloseBtn = document.querySelector('.close-btn');
+    const videoCloseBtn = document.querySelector('#videoModal .close-btn');
     const videoModal = document.getElementById('videoModal');
     const watchlistBtn = videoModal?.querySelector('.video-actions .btn.primary');
     const shareBtn = videoModal?.querySelector('.video-actions .btn.secondary');
+
+    if (!videoModal || !videoCloseBtn) {
+        console.error('Video modal or close button not found');
+        return;
+    }
 
     playButtons.forEach(button => {
         button.addEventListener('click', async function (e) {
@@ -71,9 +77,9 @@ export function initVideoPlayer() {
             videoSource = encodeURI(videoSource);
             console.log('videoSource:', videoSource);
 
-            const modalTitle = videoModal?.querySelector('.video-info h3');
-            const modalMeta = videoModal?.querySelector('.video-info .meta');
-            const modalDescription = videoModal?.querySelector('.video-info .video-description');
+            const modalTitle = videoModal.querySelector('.video-info h3');
+            const modalMeta = videoModal.querySelector('.video-info .meta');
+            const modalDescription = videoModal.querySelector('.video-info .video-description');
 
             if (modalTitle) modalTitle.textContent = videoTitle;
             if (modalMeta) {
@@ -108,10 +114,7 @@ export function initVideoPlayer() {
                 }, { once: true });
             }
 
-            if (videoModal) {
-                videoModal.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-            }
+            utils.showModal(videoModal); // Use utils.showModal instead of style.display
 
             try {
                 await fetch(`${API_BASE_URL}/api/content/${contentId}/view`, { method: 'POST' });
@@ -128,18 +131,19 @@ export function initVideoPlayer() {
         });
     });
 
-    if (videoCloseBtn) {
-        videoCloseBtn.addEventListener('click', () => {
-            const videoElement = document.getElementById('iconPlayer');
-            if (videoElement) videoElement.pause();
-            if (videoModal) videoModal.style.display = 'none';
-            document.body.style.overflow = '';
-        });
-    }
+    videoCloseBtn.addEventListener('click', () => {
+        const videoElement = document.getElementById('iconPlayer');
+        utils.hideModals(); // Use utils.hideModals to handle modal and overflow
+        if (videoElement) {
+            videoElement.pause();
+            videoElement.currentTime = 0;
+            videoElement.src = ''; // Clear the source
+        }
+    });
 
     if (shareBtn) {
         shareBtn.addEventListener('click', () => {
-            const title = videoModal?.querySelector('.video-info h3')?.textContent || 'ICON content';
+            const title = videoModal.querySelector('.video-info h3')?.textContent || 'ICON content';
             if (navigator.share) {
                 navigator.share({
                     title,
