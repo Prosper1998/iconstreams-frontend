@@ -11,10 +11,14 @@ export const elements = {
     loginModal: document.getElementById('loginModal'),
     signupModal: document.getElementById('signupModal'),
     videoModal: document.getElementById('videoModal'),
-    authBackground: document.getElementById('authBackground')
+    authBackground: document.getElementById('authBackground'),
+    paymentModal: null // Will be set when created
 };
 
 export function initAuth() {
+    // Ensure modals are hidden by default
+    utils.hideModals();
+
     const signInBtn = document.querySelector('.sign-in-btn');
     const signUpBtn = document.querySelector('.sign-up-btn');
     const showSignupLink = document.getElementById('showSignup');
@@ -26,9 +30,10 @@ export function initAuth() {
 
     if (signInBtn) signInBtn.addEventListener('click', () => {
         if (isLoggedIn.value) {
-            showSettingsModal(); // Now defined
+            showSettingsModal(); // Show settings if logged in
         } else {
-            utils.showModal(elements.loginModal);
+            utils.hideModals(); // Hide all modals first
+            utils.showModal(elements.loginModal); // Show login modal
         }
     });
 
@@ -36,7 +41,8 @@ export function initAuth() {
         if (isLoggedIn.value) {
             signOut();
         } else {
-            utils.showModal(elements.signupModal);
+            utils.hideModals(); // Hide all modals first
+            utils.showModal(elements.signupModal); // Show signup modal
         }
     });
 
@@ -215,11 +221,17 @@ export function updateAuthUI() {
     } else {
         if (signInBtn) {
             signInBtn.textContent = 'Sign In';
-            signInBtn.onclick = () => utils.showModal(elements.loginModal);
+            signInBtn.onclick = () => {
+                utils.hideModals();
+                utils.showModal(elements.loginModal);
+            };
         }
         if (signUpBtn) {
             signUpBtn.textContent = 'Sign Up';
-            signUpBtn.onclick = () => utils.showModal(elements.signupModal);
+            signUpBtn.onclick = () => {
+                utils.hideModals();
+                utils.showModal(elements.signupModal);
+            };
         }
     }
 }
@@ -232,7 +244,10 @@ export function updateMobileMenuAuth() {
             mobileSignInLink.onclick = showSettingsModal;
         } else {
             mobileSignInLink.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
-            mobileSignInLink.onclick = () => utils.showModal(elements.loginModal);
+            mobileSignInLink.onclick = () => {
+                utils.hideModals();
+                utils.showModal(elements.loginModal);
+            };
         }
     }
 }
