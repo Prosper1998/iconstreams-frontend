@@ -1,4 +1,3 @@
-// player.js
 import { API_BASE_URL, BUNNY_BASE_URL, utils } from './utils.js';
 import { isLoggedIn, watchlist, elements } from './auth.js';
 import { updateWatchlistDisplay } from './ui.js';
@@ -31,15 +30,10 @@ async function loadWatchlist() {
 
 export function initVideoPlayer() {
     const playButtons = document.querySelectorAll('.play-btn');
-    const videoCloseBtn = document.querySelector('#videoModal .close-btn');
+    const videoCloseBtn = document.querySelector('.close-btn');
     const videoModal = document.getElementById('videoModal');
     const watchlistBtn = videoModal?.querySelector('.video-actions .btn.primary');
     const shareBtn = videoModal?.querySelector('.video-actions .btn.secondary');
-
-    if (!videoModal || !videoCloseBtn) {
-        console.error('Video modal or close button not found:', { videoModal, videoCloseBtn });
-        return;
-    }
 
     playButtons.forEach(button => {
         button.addEventListener('click', async function (e) {
@@ -77,9 +71,9 @@ export function initVideoPlayer() {
             videoSource = encodeURI(videoSource);
             console.log('videoSource:', videoSource);
 
-            const modalTitle = videoModal.querySelector('.video-info h3');
-            const modalMeta = videoModal.querySelector('.video-info .meta');
-            const modalDescription = videoModal.querySelector('.video-info .video-description');
+            const modalTitle = videoModal?.querySelector('.video-info h3');
+            const modalMeta = videoModal?.querySelector('.video-info .meta');
+            const modalDescription = videoModal?.querySelector('.video-info .video-description');
 
             if (modalTitle) modalTitle.textContent = videoTitle;
             if (modalMeta) {
@@ -96,7 +90,7 @@ export function initVideoPlayer() {
                 source.src = videoSource;
                 source.type = videoSource.includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4';
 
-                videoElement.pause();
+                videoElement.pause(); // Clear current play state
                 videoElement.muted = true;
                 videoElement.autoplay = true;
                 videoElement.load();
@@ -114,7 +108,10 @@ export function initVideoPlayer() {
                 }, { once: true });
             }
 
-            utils.showModal(videoModal);
+            if (videoModal) {
+                videoModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
 
             try {
                 await fetch(`${API_BASE_URL}/api/content/${contentId}/view`, { method: 'POST' });
@@ -131,20 +128,18 @@ export function initVideoPlayer() {
         });
     });
 
-    videoCloseBtn.addEventListener('click', () => {
-        console.log('Close button clicked'); // Debug log
-        const videoElement = document.getElementById('iconPlayer');
-        utils.hideModals();
-        if (videoElement) {
-            videoElement.pause();
-            videoElement.currentTime = 0;
-            videoElement.src = '';
-        }
-    });
+    if (videoCloseBtn) {
+        videoCloseBtn.addEventListener('click', () => {
+            const videoElement = document.getElementById('iconPlayer');
+            if (videoElement) videoElement.pause();
+            if (videoModal) videoModal.style.display = 'none';
+            document.body.style.overflow = '';
+        });
+    }
 
     if (shareBtn) {
         shareBtn.addEventListener('click', () => {
-            const title = videoModal.querySelector('.video-info h3')?.textContent || 'ICON content';
+            const title = videoModal?.querySelector('.video-info h3')?.textContent || 'ICON content';
             if (navigator.share) {
                 navigator.share({
                     title,
@@ -199,7 +194,7 @@ export async function toggleWatchlist(contentId, title, meta, image, button) {
                 localStorage.setItem('watchlist', JSON.stringify(watchlist.value));
                 updateWatchlistButton(button, contentId);
                 updateWatchlistDisplay();
-                utils.showNotification(`${title} added to watchlist', 'success');
+                utils.showNotification(`${title} added to watchlist`, 'success');
             } else {
                 utils.showNotification(result.message || 'Error adding to watchlist', 'error');
             }
