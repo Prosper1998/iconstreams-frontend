@@ -37,7 +37,7 @@ export function initVideoPlayer() {
     const shareBtn = videoModal?.querySelector('.video-actions .btn.secondary');
 
     if (!videoModal || !videoCloseBtn) {
-        console.error('Video modal or close button not found');
+        console.error('Video modal or close button not found:', { videoModal, videoCloseBtn });
         return;
     }
 
@@ -96,7 +96,7 @@ export function initVideoPlayer() {
                 source.src = videoSource;
                 source.type = videoSource.includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4';
 
-                videoElement.pause(); // Clear current play state
+                videoElement.pause();
                 videoElement.muted = true;
                 videoElement.autoplay = true;
                 videoElement.load();
@@ -114,7 +114,7 @@ export function initVideoPlayer() {
                 }, { once: true });
             }
 
-            utils.showModal(videoModal); // Use utils.showModal instead of style.display
+            utils.showModal(videoModal);
 
             try {
                 await fetch(`${API_BASE_URL}/api/content/${contentId}/view`, { method: 'POST' });
@@ -132,12 +132,13 @@ export function initVideoPlayer() {
     });
 
     videoCloseBtn.addEventListener('click', () => {
+        console.log('Close button clicked'); // Debug log
         const videoElement = document.getElementById('iconPlayer');
-        utils.hideModals(); // Use utils.hideModals to handle modal and overflow
+        utils.hideModals();
         if (videoElement) {
             videoElement.pause();
             videoElement.currentTime = 0;
-            videoElement.src = ''; // Clear the source
+            videoElement.src = '';
         }
     });
 
@@ -198,7 +199,7 @@ export async function toggleWatchlist(contentId, title, meta, image, button) {
                 localStorage.setItem('watchlist', JSON.stringify(watchlist.value));
                 updateWatchlistButton(button, contentId);
                 updateWatchlistDisplay();
-                utils.showNotification(`${title} added to watchlist`, 'success');
+                utils.showNotification(`${title} added to watchlist', 'success');
             } else {
                 utils.showNotification(result.message || 'Error adding to watchlist', 'error');
             }
