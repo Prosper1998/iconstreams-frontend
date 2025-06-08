@@ -399,24 +399,16 @@ nav {
     color: var(--light);
 }
 
-.content-slider {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    padding-bottom: 1rem;
-}
-
 /* Grid Layout for Movies Page */
 .movies-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
     padding: 0.5rem;
 }
 
 .content-card {
-    flex: 0 0 calc(50% - 0.5rem);
-    max-width: calc(50% - 0.5rem);
+    width: 100%;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
     overflow: hidden;
@@ -426,8 +418,8 @@ nav {
 }
 
 .content-card.featured {
-    flex: 0 0 100%;
-    max-width: 100%;
+    grid-column: span 2;
+    height: 300px;
 }
 
 .content-card:hover {
@@ -436,21 +428,49 @@ nav {
 }
 
 .card-badge {
+    position: absolute;
     top: 10px;
     left: 10px;
+    background: var(--primary);
+    color: var(--light);
     padding: 0.3rem 0.8rem;
+    border-radius: 20px;
     font-size: 0.7rem;
+    font-weight: 600;
+    box-shadow: var(--shadow);
+}
+
+.card-image {
+    position: relative;
+    height: 180px;
+    overflow: hidden;
 }
 
 .card-image img {
-    height: 120px;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.content-card:hover .card-image img {
+    transform: scale(1.05);
 }
 
 .featured .card-image img {
-    height: 180px;
+    height: 100%;
 }
 
 .card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
     opacity: 0;
     transition: opacity 0.3s ease;
 }
@@ -460,70 +480,140 @@ nav {
 }
 
 .play-btn {
+    background: var(--primary);
+    border: none;
     width: 50px;
     height: 50px;
+    border-radius: 50%;
+    color: var(--light);
     font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+    box-shadow: var(--shadow);
 }
 
 .play-btn:hover {
+    background: #5a52cc;
     transform: scale(1.1);
 }
 
 .card-info {
     padding: 1rem;
+    text-align: center;
 }
 
 .card-info h3 {
     font-size: 1.1rem;
+    font-weight: 600;
     margin-bottom: 0.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .meta {
+    display: flex;
+    justify-content: center;
     gap: 0.5rem;
     font-size: 0.8rem;
+    color: var(--gray);
     margin-bottom: 0.5rem;
+}
+
+.meta-dot {
+    width: 5px;
+    height: 5px;
+    background: var(--gray);
+    border-radius: 50%;
 }
 
 .card-info p {
     font-size: 0.85rem;
-}
-
-/* Categories Section */
-.categories-grid {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-}
-
-.category-card img {
-    height: 100px;
-}
-
-.category-overlay h4 {
-    font-size: 1.1rem;
+    color: var(--gray);
+    line-height: 1.4;
+    height: 2.8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 
 /* Video Player Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1003;
+}
+
+.modal.show {
+    display: flex;
+}
+
 .modal-content {
+    position: relative;
     max-width: 90%;
-    padding: 1rem;
+    width: 900px;
+    background: var(--dark);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
 }
 
 .close-btn {
+    position: absolute;
     top: 10px;
     right: 10px;
+    background: none;
+    border: none;
+    color: var(--light);
     font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+    color: var(--primary);
 }
 
 .video-js {
-    height: 150px;
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.video-info {
+    padding: 1.5rem;
 }
 
 .video-info h3 {
     font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.7rem;
+}
+
+.video-info .meta {
+    margin-bottom: 1rem;
 }
 
 .video-description {
     font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.video-actions {
+    display: flex;
+    gap: 1.5rem;
 }
 
 /* Auth Modals */
@@ -618,20 +708,107 @@ nav {
 
 /* Notification System */
 .notification {
+    position: fixed;
     bottom: 15px;
     right: 15px;
+    background: var(--primary);
+    color: var(--light);
     padding: 0.8rem 1.5rem;
-    font-size: 0.9rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    z-index: 1003;
+    box-shadow: var(--shadow);
+    animation: slideInRight 0.5s ease;
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.notification.success {
+    background: var(--accent);
+    color: var(--dark);
+}
+
+.notification.error {
+    background: var(--secondary);
+}
+
+.notification.warning {
+    background: #ffcc00;
+    color: #000;
+}
+
+.notification.info {
+    background: #00b7ff;
 }
 
 /* User Profile Dropdown */
+.user-profile {
+    position: relative;
+}
+
+.profile-img {
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--light);
+    transition: color 0.3s ease;
+}
+
+.profile-img:hover {
+    color: var(--primary);
+}
+
 .dropdown-content {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--dark);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    display: none;
+    flex-direction: column;
     min-width: 180px;
+    z-index: 1000;
+    box-shadow: var(--shadow);
+}
+
+.user-profile.dropdown-active .dropdown-content {
+    display: flex;
+    animation: fadeIn 0.3s ease;
 }
 
 .dropdown-content a {
     padding: 0.8rem 1rem;
+    color: var(--light);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
     font-size: 0.9rem;
+    transition: background 0.3s ease;
+}
+
+.dropdown-content a:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 0.4rem 0;
+}
+
+.dropdown-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
 }
 
 /* Settings Modal Styles */
@@ -643,15 +820,59 @@ nav {
     padding: 0 1rem 1rem;
 }
 
+.settings-section {
+    margin-bottom: 2rem;
+}
+
 .settings-section h3 {
     font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: var(--light);
+}
+
+.settings-item {
+    margin-bottom: 1rem;
+}
+
+.settings-item label {
+    display: block;
+    color: var(--gray);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
 }
 
 .settings-item input[type="text"],
 .settings-item input[type="email"],
 .settings-item input[type="password"] {
+    width: 100%;
     padding: 0.7rem;
+    border: none;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--light);
     font-size: 0.9rem;
+}
+
+.settings-item input[readonly] {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--gray);
+}
+
+.settings-item input[type="password"]::placeholder {
+    color: var(--gray);
+}
+
+.settings-item .checkbox {
+    margin-top: 0.5rem;
+}
+
+.settings-actions {
+    margin-top: 2rem;
+    text-align: right;
+}
+
+.save-settings-btn {
+    padding: 0.8rem 1.5rem;
 }
 
 /* Watchlist Modal Styles */
@@ -677,27 +898,205 @@ nav {
     max-width: 90% !important;
 }
 
+.user-welcome {
+    color: var(--gray);
+    margin-top: -1rem;
+    margin-bottom: 1rem;
+}
+
+.trial-info {
+    background: rgba(50, 215, 75, 0.1);
+    color: var(--accent);
+    padding: 0.6rem 1rem;
+    border-radius: 4px;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+}
+
 /* Payment History Styles */
 .payment-history-section {
     padding: 0 1rem;
 }
 
+.payment-history-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.payment-history-items {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
 .payment-history-item {
     padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.payment-history-info p {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.payment-history-info p strong {
+    color: var(--light);
+    margin-right: 0.5rem;
 }
 
 /* Payment Methods */
+.payment-methods {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.payment-methods h3 {
+    margin-bottom: 0.5rem;
+}
+
+.selected-plan {
+    color: var(--gray);
+    margin-bottom: 2rem;
+}
+
+.payment-method-group {
+    margin-bottom: 2rem;
+}
+
+.payment-method-group h4 {
+    margin-bottom: 1rem;
+    color: var(--light);
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
 .mobile-money-options {
+    display: grid;
     grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.payment-option {
+    display: block;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+}
+
+.payment-option input {
+    display: none;
 }
 
 .payment-option-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
     padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.payment-option input:checked + .payment-option-content {
+    background: rgba(108, 99, 255, 0.1);
+    border-color: var(--primary);
+}
+
+.payment-option-name {
+    font-weight: 500;
 }
 
 .payment-action-buttons {
-    flex-direction: column;
-    gap: 0.8rem;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+}
+
+/* Bank Transfer Details */
+.bank-details {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.bank-info {
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.bank-info p {
+    margin-bottom: 0.8rem;
+}
+
+.bank-note,
+.mobile-note {
+    font-size: 0.9rem;
+    color: var(--gray);
+}
+
+/* Mobile Money Instructions */
+.mobile-money-instructions {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.mobile-money-instructions ol {
+    margin: 1.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.mobile-money-instructions li {
+    margin-bottom: 0.8rem;
+}
+
+.payment-confirmation {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.payment-processing h3 {
+    margin-bottom: 1.5rem;
+}
+
+.payment-processing .error-message {
+    color: var(--secondary);
+    margin-bottom: 1.5rem;
+}
+
+/* Confirm Modal Styles */
+.confirm-modal-content {
+    max-width: 400px !important;
+}
+
+.confirm-message {
+    padding: 1rem 2rem;
+    color: var(--gray);
+    font-size: 1rem;
+}
+
+.confirm-actions {
+    padding: 0 2rem 2rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
 }
 
 /* Responsive Design */
@@ -707,6 +1106,13 @@ nav {
     }
     .hero-content h1 {
         font-size: 2.5rem;
+    }
+    .movies-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+    .content-card.featured {
+        grid-column: span 1;
+        height: 250px;
     }
 }
 
@@ -735,15 +1141,26 @@ nav {
         font-size: 1.3rem;
     }
     .movies-grid {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
     .content-card {
-        flex: 0 0 calc(50% - 0.5rem);
-        max-width: calc(50% - 0.5rem);
+        height: 250px;
     }
     .content-card.featured {
-        flex: 0 0 100%;
-        max-width: 100%;
+        height: 200px;
+    }
+    .card-image {
+        height: 150px;
+    }
+    .card-info h3 {
+        font-size: 1rem;
+    }
+    .meta {
+        font-size: 0.7rem;
+    }
+    .card-info p {
+        font-size: 0.8rem;
+        height: 2.4rem;
     }
     .mobile-money-options {
         grid-template-columns: 1fr;
@@ -770,12 +1187,20 @@ nav {
         grid-template-columns: 1fr;
     }
     .content-card {
-        flex: 0 0 100%;
-        max-width: 100%;
+        height: 200px;
     }
     .content-card.featured {
-        flex: 0 0 100%;
-        max-width: 100%;
+        height: 180px;
+    }
+    .card-image {
+        height: 120px;
+    }
+    .card-info h3 {
+        font-size: 0.9rem;
+    }
+    .card-info p {
+        font-size: 0.75rem;
+        height: 2rem;
     }
     .section-header {
         flex-direction: column;
@@ -786,5 +1211,9 @@ nav {
     }
     .video-js {
         height: 120px;
+    }
+    .payment-action-buttons {
+        flex-direction: column;
+        gap: 0.8rem;
     }
 }
